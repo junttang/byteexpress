@@ -880,35 +880,6 @@ static inline void nvme_sq_byteexpress_transfer(struct nvme_queue *nvmeq, u8 *pa
 		nvmeq->sq_tail = 0;
 }
 
-// Estimate how many real slots were consumed per head increment
-#define BE_SLOT_PER_CMD 3  // 1 cmd + 2 payloads (adjust based on actual data_len)
-
-// Replace nvmeq_has_room() with custom check
-static bool be_nvmeq_has_room(struct nvme_queue *nvmeq, int needed)
-{
-    int real_head = (nvmeq->cq_head * BE_SLOT_PER_CMD) % nvmeq->q_depth;
-    int tail = nvmeq->sq_tail;
-    int used;
-
-    if (tail >= real_head)
-        used = tail - real_head;
-    else
-        used = nvmeq->q_depth - real_head + tail;
-
-    return used + needed < nvmeq->q_depth;
-}
-
-static inline bool nvmeq_has_room(struct nvme_queue *nvmeq, int slots_needed)
-{
-    u16 head = READ_ONCE(nvmeq->cq_head);
-    u16 tail = nvmeq->sq_tail;
-
-    u16 used = (tail >= head) ? (tail - head) : (nvmeq->q_depth - head + tail);
-    u16 available = nvmeq->q_depth - 1 - used;
-
-    return (available >= slots_needed);
-}
-
 /*
  * NOTE: ns is NULL when called on the admin queue.
  */
