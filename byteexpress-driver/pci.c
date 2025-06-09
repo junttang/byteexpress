@@ -909,9 +909,6 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
 	if (unlikely(ret))
 		return ret;
 	spin_lock(&nvmeq->sq_lock);
-  ktime_t start, end;
-  s64 duration_ns;
-  start = ktime_get_ns();
 
 	size_t data_len = blk_rq_bytes(req);
 	struct nvme_command *cmd = &iod->cmd;
@@ -944,11 +941,7 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
 		nvme_sq_copy_cmd(nvmeq, &iod->cmd);
 		nvme_write_sq_db(nvmeq, bd->last);
 	}
-  end = ktime_get_ns();
-  duration_ns = end - start;
 
-  printk(KERN_INFO "[ByteExpress] Execution time: %lld ns\n", duration_ns);
-	
 	spin_unlock(&nvmeq->sq_lock);
 	return BLK_STS_OK;
 }
