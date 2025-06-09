@@ -47,6 +47,31 @@ We have chosen not to release other controller logic files, as they are tightly 
 
 However, we guarantee that `host_lld.c` and `host_lld.h` in this repository are cleanly designed and **can be integrated into any OpenSSD firmware** with minimal effort—**simply by specifying the DRAM buffer address** to use for payload copying.
 
+### Integration Steps
+
+To integrate ByteExpress support into the Cosmos+ OpenSSD firmware, the following modifications are required in addition to the host_lld.c/.h files:
+
+- Define a custom NVMe opcode for ByteExpress
+  - In `nvme.h`, add the following line to define the new command opcode:
+
+```c
+#define IO_NVM_BYTEEXPRESS  0xA8
+```
+
+- Modify nvme_main.c to pass the inline buffer address
+  - Update the call to get_nvme_cmd() as follows to include the DRAM buffer destination for inline payload copying:
+
+```c
+// Original
+// cmdValid = get_nvme_cmd(&nvmeCmd.qID, &nvmeCmd.cmdSlotTag, &nvmeCmd.cmdSeqNum, nvmeCmd.cmdDword);
+
+// Modified for ByteExpress
+cmdValid = get_nvme_cmd(&nvmeCmd.qID, &nvmeCmd.cmdSlotTag, &nvmeCmd.cmdSeqNum, nvmeCmd.cmdDword, INLINE_TRANSFER_BUFFER_ADDR);
+// Here, INLINE_TRANSFER_BUFFER_ADDR should be defined as a valid DRAM address where incoming payload chunks (64B) will be copied.
+```
+
+These minimal changes enable the controller to recognize and process ByteExpress-enhanced NVMe commands while remaining backward-compatible with the standard firmware structure.
+
 ---
 
 ## Contact
