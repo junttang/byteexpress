@@ -18,7 +18,7 @@ This implementation is based on the design proposed in the following paper:
 
 ---
 
-## ⚙️ Setup Instructions
+## Setup Instructions
 
 ### 1. PCIe Re-Enumeration after Firmware Load
 
@@ -120,6 +120,6 @@ Use the example client in `../test_app/test_example.h` and `test_example.cc` to 
 
 ---
 
-## Author
+## Contact
 
 **Junhyeok Park** (junttang@sogang.ac.kr)
