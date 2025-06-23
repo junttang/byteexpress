@@ -57,9 +57,7 @@ int ByteExpress::Cosmos::Put(const std::string &key, const std::string &value)
     cdw13 = value.size();
     err = nvme_passthru(NVME_CMD_BYTEEXPRESS_PUT, 0, 0, NSID, cdw2, cdw3, 
             cdw10, cdw11, cdw12, cdw13, cdw14, cdw15, 
-            value.size(), data, result); // this doesn't affect PRP routine
-            //data_len, data, result);
-	    // TODO: it is turned out to be that it does not affect PRP, so this means that we can use this info for the driver to know the size of payload. The next step is to extract host buffer address to memcpy the payload into the submission queue, with a 64B-count calculated by the real payload size. The controller needs corresponding modifcations.
+            value.size(), data, result); 
     free(data);
     if (err < 0) {
         return -1;
